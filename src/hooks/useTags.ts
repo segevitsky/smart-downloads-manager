@@ -6,13 +6,30 @@ import { DEFAULT_TAGS, Tag } from "../types";
 export const useTags = () => {
   const [allTags, setAllTags] = useState<Tag[]>([]);
 
-  // טעינת תגיות בהתחלה
-  useEffect(() => {
+
+    // טעינת תגיות בהתחלה
     const loadTags = async () => {
-      const { customTags = [] } = await chrome.storage.sync.get("customTags");
+      const { customTags = [] } = await chrome.storage.sync.get('customTags');
       setAllTags([...DEFAULT_TAGS, ...customTags]);
     };
+
+
+  // טעינת תגיות בהתחלה
+  useEffect(() => {
     loadTags();
+    
+    // האזנה לשינויים בסטורג'
+    const handleStorageChange = (changes: { [key: string]: chrome.storage.StorageChange }) => {
+      if (changes.customTags) {
+        loadTags();  // טעינה מחדש של התגיות
+      }
+    };
+
+    chrome.storage.onChanged.addListener(handleStorageChange);
+    
+    return () => {
+      chrome.storage.onChanged.removeListener(handleStorageChange);
+    };
   }, []);
 
   // תיוג קובץ - עכשיו מקבל מערך של תגיות
@@ -41,16 +58,20 @@ export const useTags = () => {
     const newTag: Tag = {
       id: `custom-${Date.now()}`,
       label,
-      isCustom: true,
+      isCustom: true
     };
-
-    const { customTags = [] } = await chrome.storage.sync.get("customTags");
+    
+    const { customTags = [] } = await chrome.storage.sync.get('customTags');
     const updatedTags = [...customTags, newTag];
     await chrome.storage.sync.set({ customTags: updatedTags });
-    setAllTags((prev) => [...prev, newTag]); // עדכון מיידי של הסטייט
+    
+    // עדכון מיידי של הסטייט
+    setAllTags(prev => [...prev, newTag]);
+    
     return newTag;
   };
-
+  
+  
   // מחיקת תגית מותאמת אישית
   const deleteCustomTag = async (tagId: string) => {
     const { customTags = [] } = await chrome.storage.sync.get("customTags");
@@ -77,46 +98,3 @@ export const useTags = () => {
     deleteCustomTag,
   };
 };
-
-// export const useTags = () => {
-//   const [allTags, setAllTags] = useState<Tag[]>([...DEFAULT_TAGS]); // שינוי כאן
-//   const [customTags, setCustomTags] = useState<Tag[]>([]);
-
-//   useEffect(() => {
-//     chrome.storage.sync.get("customTags").then((result) => {
-//       if (result.customTags) {
-//         setCustomTags(result.customTags);
-//         setAllTags([...DEFAULT_TAGS, ...result.customTags]); // עדכון כל התגיות
-//       }
-//     });
-//   }, []);
-
-//   const tagFile = async (fileId: string, tagId: string) => {
-//     const { fileTags = {} } = await chrome.storage.sync.get("fileTags");
-//     fileTags[fileId] = fileTags[fileId] || [];
-//     if (!fileTags[fileId].includes(tagId)) {
-//       fileTags[fileId].push(tagId);
-//       await chrome.storage.sync.set({ fileTags });
-//     }
-//   };
-
-//   const addCustomTag = async (label: string) => {
-//     const newTag: Tag = {
-//       id: `custom-${Date.now()}`,
-//       label,
-//       isCustom: true,
-//     };
-
-//     const updatedCustomTags = [...customTags, newTag];
-//     setCustomTags(updatedCustomTags);
-//     setAllTags([...DEFAULT_TAGS, ...updatedCustomTags]); // עדכון כל התגיות
-//     await chrome.storage.sync.set({ customTags: updatedCustomTags });
-//     return newTag;
-//   };
-
-//   return {
-//     allTags, // עכשיו מחזירים את המערך
-//     tagFile,
-//     addCustomTag,
-//   };
-// };
