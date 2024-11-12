@@ -1,6 +1,8 @@
 // public/background.js
 chrome.runtime.onInstalled.addListener(() => {
   console.log("Extension installed");
+  chrome.action.setPopup({ popup: "index.html" });
+  chrome.action.enable();
 });
 
 chrome.downloads.onCreated.addListener((downloadItem) => {
