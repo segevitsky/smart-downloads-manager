@@ -1,5 +1,6 @@
 // src/components/SearchBar/index.tsx
-import React from 'react';
+import React from "react";
+import { useTags } from "../../hooks/useTags";
 
 interface SearchBarProps {
   searchTerm: string;
@@ -12,18 +13,19 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   searchTerm,
   onSearchChange,
   filterType,
-  onFilterChange
+  onFilterChange,
 }) => {
   const filters = [
-    { value: 'all', label: 'כל הקבצים' },
-    { value: 'images', label: '🖼️ תמונות' },
-    { value: 'documents', label: '📄 מסמכים' },
-    { value: 'spreadsheets', label: '📊 גליונות' },
-    { value: 'archives', label: '📦 קבצים דחוסים' },
-    { value: 'media', label: '🎥 מדיה' },
-    { value: 'other', label: '📎 אחר' }
+    { value: "all", label: "כל הקבצים" },
+    { value: "images", label: "🖼️ תמונות" },
+    { value: "documents", label: "📄 מסמכים" },
+    { value: "spreadsheets", label: "📊 גליונות" },
+    { value: "archives", label: "📦 קבצים דחוסים" },
+    { value: "media", label: "🎥 מדיה" },
+    { value: "other", label: "📎 אחר" },
   ];
 
+  const { allTags } = useTags();
   return (
     <div className="flex flex-col sm:flex-row gap-4 bg-white p-4 rounded-xl shadow-sm">
       <div className="flex-1 relative">
@@ -42,8 +44,10 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                      placeholder-gray-400"
         />
         {/* אייקון החיפוש */}
-        <span className="absolute right-4 top-1/2 -translate-y-1/2 
-                        text-gray-400 pointer-events-none">
+        <span
+          className="absolute right-4 top-1/2 -translate-y-1/2 
+                        text-gray-400 pointer-events-none"
+        >
           🔍
         </span>
       </div>
@@ -51,7 +55,10 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       {/* סלקט הפילטרים */}
       <select
         value={filterType}
-        onChange={(e) => onFilterChange(e.target.value)}
+        onChange={(e) => {
+          console.log({ e });
+          onFilterChange(e.target.value);
+        }}
         className="px-4 py-3 rounded-xl 
                    border border-gray-200 
                    focus:outline-none focus:ring-2 
@@ -63,20 +70,31 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                    text-black
                    hover:border-gray-300"
       >
-        {filters.map(filter => (
-          <option key={filter.value} value={filter.value} 
-                  className="py-2">
+        {filters.map((filter) => (
+          <option key={filter.value} value={filter.value} className="py-2">
             {filter.label}
           </option>
         ))}
+
+        <optgroup label="תגיות">
+          {allTags?.map(
+            (
+              tag // עכשיו זה עובד על המערך tags
+            ) => (
+              <option key={tag.id} value={`tag:${tag.id}`}>
+                {tag.label}
+              </option>
+            )
+          )}
+        </optgroup>
       </select>
 
       {/* כפתור ניקוי */}
-      {(searchTerm || filterType !== 'all') && (
-        <button 
+      {(searchTerm || filterType !== "all") && (
+        <button
           onClick={() => {
-            onSearchChange('');
-            onFilterChange('all');
+            onSearchChange("");
+            onFilterChange("all");
           }}
           className="px-4 py-3 text-sm text-gray-600 
                      hover:text-gray-800

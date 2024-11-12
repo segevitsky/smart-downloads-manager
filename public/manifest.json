@@ -1,32 +1,27 @@
 {
-    "manifest_version": 3,
-    "name": "Smart Downloads Manager",
-    "version": "1.0",
-    "description": "ארגון חכם של הורדות",
-    "permissions": [
-      "downloads",
-      "downloads.open",
-      "downloads.shelf",
-      "storage"
-    ],
-    "action": {
-      "default_popup": "index.html",
-      "default_icon": {
-        "16": "icon16.png",
-        "48": "icon48.png",
-        "128": "icon128.png"
-      }
-    },
-    "background": {
-      "service_worker": "background.js"
-    },
-    "commands": {
+  "manifest_version": 3,
+  "name": "Control.Shift.One",
+  "version": "1.0",
+  "description": "ארגון חכם של הורדות",
+  "permissions": ["downloads", "downloads.open", "downloads.shelf", "storage"],
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "commands": {
     "_execute_action": {
       "suggested_key": {
-        "default": "Ctrl+Shift+J",
+        "default": "Ctrl+Shift+1",
         "mac": "Command+Shift+1"
       },
       "description": "פתח את מנהל ההורדות"
     }
   }
-  }
+}

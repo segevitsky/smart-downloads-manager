@@ -1,27 +1,53 @@
 // src/App.tsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SearchBar } from "./components/SearchBar";
 import { ViewControls } from "./components/ViewControls";
 import { FileCard } from "./components/FileCard";
 import { useDownloads } from "./hooks/useDownloads";
-import { ViewType } from "./types";
 import { getFileType } from "./utils";
+import { ViewType, Download } from "./types";
 
 function App() {
   const [viewType, setViewType] = useState<ViewType>("grid");
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
+  const [filteredDownloads, setFilteredDownloads] = useState<Download[]>([]);
 
   const { downloads, loading, error } = useDownloads();
 
-  const filteredDownloads = downloads.filter((download) => {
-    const matchesSearch = download.filename
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesType =
-      filterType === "all" || getFileType(download.filename) === filterType;
-    return matchesSearch && matchesType;
-  });
+  useEffect(() => {
+    const filterDownloads = async () => {
+      if (!downloads.length) return;
+
+      let filtered = [...downloads];
+
+      // אם זה סינון לפי תגית
+      if (filterType.startsWith("tag:")) {
+        const tagId = filterType.replace("tag:", "");
+        const { fileTags = {} } = await chrome.storage.sync.get("fileTags");
+        filtered = filtered.filter(
+          (download) => fileTags[download.id]?.[0] === tagId
+        );
+      }
+      // סינון רגיל לפי סוג קובץ
+      else if (filterType !== "all") {
+        filtered = filtered.filter(
+          (download) => getFileType(download.filename) === filterType
+        );
+      }
+
+      // סינון לפי טקסט חיפוש
+      if (searchTerm) {
+        filtered = filtered.filter((download) =>
+          download.filename.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }
+
+      setFilteredDownloads(filtered);
+    };
+
+    filterDownloads();
+  }, [downloads, filterType, searchTerm]);
 
   if (loading) return <div>טוען...</div>;
   if (error) return <div>שגיאה: {error.message}</div>;
@@ -55,9 +81,13 @@ function App() {
           }
         `}
         >
-          {filteredDownloads.map((file) => (
-            <FileCard key={file.id} file={file} viewType={viewType} />
-          ))}
+          {filteredDownloads.map(
+            (
+              file: Download // מוסיפים את הטיפוס
+            ) => (
+              <FileCard key={file.id} file={file} viewType={viewType} />
+            )
+          )}
         </div>
       </div>
     </div>
