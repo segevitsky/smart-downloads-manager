@@ -1,7 +1,7 @@
 // src/components/FileCard/index.tsx
 import { useState, useEffect } from "react";
 import { Download, ViewType } from "../../types";
-import { formatFileSize, getFileIcon, getMimeType } from "../../utils";
+import { formatFileSize, getFileIcon } from "../../utils";
 import { ContextMenu } from "../ContextMenu";
 import { useTags } from "../../hooks/useTags";
 
@@ -51,34 +51,33 @@ export const FileCard = ({ file, viewType }: FileCardProps) => {
   };
 
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
-    // הקובץ עצמו יהיה שם הקובץ בלבד, בלי הנתיב המלא
-    const fileName = file.filename.split("\\").pop()?.split("/").pop() || "";
-
-    e.dataTransfer.effectAllowed = "copy";
-
+    const fileName = file.filename.split('\\').pop()?.split('/').pop() || '';
+    
     try {
-      // שליחת רק שם הקובץ בתור טקסט
-      e.dataTransfer.setData("text/plain", fileName);
+        if (file.url && file.mime) {
+            // שימוש ישיר ב-base64 URL
+            const downloadString = `${file.mime}:${fileName}:${file.url}`;
+            
+            e.dataTransfer.effectAllowed = 'copy';
+            // קודם נגדיר את ה-DownloadURL
+            e.dataTransfer.setData('DownloadURL', downloadString);
+            e.dataTransfer.setData('text/plain', fileName);
 
-      // אם יש לנו URL מקורי של הקובץ
-      if (file.url) {
-        e.dataTransfer.setData("text/uri-list", file.url);
-        e.dataTransfer.setData(
-          "DownloadURL",
-          `${getMimeType(fileName)}:${fileName}:${file.url}`
-        );
-      }
+            console.log('Drag data:', { downloadString, fileName, url: file.url });
+        } else {
+            e.dataTransfer.setData('text/plain', fileName);
+        }
     } catch (error) {
-      console.error("Error setting drag data:", error);
+        console.error('Error during drag:', error);
+        e.dataTransfer.setData('text/plain', fileName);
     }
 
-    // אפקט ויזואלי בזמן גרירה
-    e.currentTarget.classList.add("dragging");
-  };
+    e.currentTarget.classList.add('dragging');
+};
 
-  const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
-    e.currentTarget.classList.remove("dragging");
-  };
+const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
+    e.currentTarget.classList.remove('dragging');
+};
 
   const splittedFilename = file.filename.split("/");
   const completeFilename = splittedFilename[splittedFilename.length - 1];

@@ -50,10 +50,11 @@ function App() {
 
   return (
     <div
-      className="w-[800px] h-[600px] bg-gradient-to-br from-gray-50 to-gray-100 p-6"
+      className="w-[800px] overflow-scroll h-[100vh] bg-gradient-to-br from-gray-50 to-gray-100 p-6"
       dir="rtl"
+
     >
-      <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-xl p-6 space-y-6">
+      <div className="max-w-7xl h-[100vh] overflow-scroll mx-auto bg-white rounded-2xl shadow-xl p-6 space-y-6">
         <header className="flex justify-between items-center border-b pb-4">
           <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-400">
             ההורדות שלי
