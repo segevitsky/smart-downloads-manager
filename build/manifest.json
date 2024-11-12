@@ -1,8 +1,5 @@
 {
   "manifest_version": 3,
-  "chrome_url_overrides": {
-    "newtab": "index.html"
-  },
   "name": "Control.Shift.One",
   "version": "1.0",
   "description": "ארגון חכם של הורדות",
@@ -22,9 +19,7 @@
     }
   },
   "background": {
-    "service_worker": "background.js",
-    "type": "module",
-    "persistent": true
+    "service_worker": "background.js"
   },
   "commands": {
     "_execute_action": {

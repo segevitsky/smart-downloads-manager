@@ -1,9 +1,4 @@
 // public/background.js
-chrome.runtime.onInstalled.addListener(() => {
-  console.log("Extension installed");
-  chrome.action.setPopup({ popup: "index.html" });
-  chrome.action.enable();
-});
 
 chrome.downloads.onCreated.addListener((downloadItem) => {
   console.log("New download started:", downloadItem);
@@ -21,4 +16,17 @@ chrome.action.onClicked.addListener(() => {
     height: 600,
     focused: true,
   });
+});
+
+// גם כשלוחצים על קיצור המקלדת
+chrome.commands.onCommand.addListener((command) => {
+  if (command === "_execute_action") {
+    chrome.windows.create({
+      url: chrome.runtime.getURL("index.html"),
+      type: "popup",
+      width: 800,
+      height: 600,
+      focused: true,
+    });
+  }
 });
