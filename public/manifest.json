@@ -3,9 +3,15 @@
   "name": "Control.Shift.One",
   "version": "1.0",
   "description": "ארגון חכם של הורדות",
-  "permissions": ["downloads", "downloads.open", "downloads.shelf", "storage"],
+  "permissions": [
+    "downloads",
+    "downloads.open",
+    "downloads.shelf",
+    "storage",
+    "contextMenus",
+    "tabs"
+  ],
   "action": {
-    "default_popup": "index.html",
     "default_icon": {
       "16": "icon16.png",
       "48": "icon48.png",

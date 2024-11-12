@@ -1,7 +1,7 @@
 // src/components/FileCard/index.tsx
 import { useState, useEffect } from "react";
 import { Download, Tag, ViewType } from "../../types";
-import { formatFileSize, getFileIcon } from "../../utils";
+import { formatFileSize, getFileIcon, getMimeType } from "../../utils";
 import { ContextMenu } from "../ContextMenu";
 import { useTags } from "../../hooks/useTags";
 
@@ -27,6 +27,7 @@ export const FileCard = ({ file, viewType }: FileCardProps) => {
       setFileTag(tag ? [tag] : []);
     }
   };
+
   useEffect(() => {
     loadFileTag();
   }, [file.id, allTags]);
@@ -49,6 +50,35 @@ export const FileCard = ({ file, viewType }: FileCardProps) => {
     }
   };
 
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
+    // במקום להשתמש בנתיב המלא, נקח רק את שם הקובץ
+    const fileName = file.filename.split("\\").pop()?.split("/").pop() || "";
+
+    e.dataTransfer.effectAllowed = "copy";
+
+    try {
+      // שליחת רק שם הקובץ בתור טקסט
+      e.dataTransfer.setData("text/plain", fileName);
+
+      // אם יש לנו URL מקורי של הקובץ
+      if (file.url) {
+        e.dataTransfer.setData("text/uri-list", file.url);
+        e.dataTransfer.setData(
+          "DownloadURL",
+          `${getMimeType(fileName)}:${fileName}:${file.url}`
+        );
+      }
+    } catch (error) {
+      console.error("Error setting data transfer:", error);
+    }
+
+    e.currentTarget.classList.add("dragging");
+  };
+
+  const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
+    e.currentTarget.classList.remove("dragging");
+  };
+
   const splittedFilename = file.filename.split("/");
   const completeFilename = splittedFilename[splittedFilename.length - 1];
   const filenameOnly = completeFilename.split("\\").pop();
@@ -56,6 +86,9 @@ export const FileCard = ({ file, viewType }: FileCardProps) => {
   return (
     <>
       <div
+        draggable="true"
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
         onContextMenu={handleContextMenu}
         className={`relative
       bg-white rounded-xl p-4 

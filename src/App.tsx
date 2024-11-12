@@ -21,22 +21,18 @@ function App() {
 
       let filtered = [...downloads];
 
-      // אם זה סינון לפי תגית
       if (filterType.startsWith("tag:")) {
         const tagId = filterType.replace("tag:", "");
         const { fileTags = {} } = await chrome.storage.sync.get("fileTags");
         filtered = filtered.filter(
           (download) => fileTags[download.id]?.[0] === tagId
         );
-      }
-      // סינון רגיל לפי סוג קובץ
-      else if (filterType !== "all") {
+      } else if (filterType !== "all") {
         filtered = filtered.filter(
           (download) => getFileType(download.filename) === filterType
         );
       }
 
-      // סינון לפי טקסט חיפוש
       if (searchTerm) {
         filtered = filtered.filter((download) =>
           download.filename.toLowerCase().includes(searchTerm.toLowerCase())
@@ -81,13 +77,9 @@ function App() {
           }
         `}
         >
-          {filteredDownloads.map(
-            (
-              file: Download // מוסיפים את הטיפוס
-            ) => (
-              <FileCard key={file.id} file={file} viewType={viewType} />
-            )
-          )}
+          {filteredDownloads.map((file: Download) => (
+            <FileCard key={file.id} file={file} viewType={viewType} />
+          ))}
         </div>
       </div>
     </div>
