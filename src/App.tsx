@@ -19,7 +19,7 @@ function App() {
     const filterDownloads = async () => {
       if (!downloads.length) return;
 
-      let filtered = [...downloads];
+      let filtered = [...downloads].filter((el) => el.state !== "interrupted");
 
       if (filterType.startsWith("tag:")) {
         const tagId = filterType.replace("tag:", "");
@@ -52,7 +52,6 @@ function App() {
     <div
       className="w-[800px] overflow-scroll h-[100vh] bg-gradient-to-br from-gray-50 to-gray-100 p-6"
       dir="rtl"
-
     >
       <div className="max-w-7xl h-[100vh] overflow-scroll mx-auto bg-white rounded-2xl shadow-xl p-6 space-y-6">
         <header className="flex justify-between items-center border-b pb-4">
